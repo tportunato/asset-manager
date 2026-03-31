@@ -192,8 +192,8 @@ function LineChart({data,color=C.terra,height=60}) {
       <polygon points={fill} fill={`url(#g${color.replace(/[^a-z0-9]/gi,"")})`}/>
       <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
       {vals.map((v,i)=><circle key={i} cx={x(i)} cy={y(v)} r="3" fill={color}/>)}
-      {data.map((d,i)=>(
-        <text key={i} x={x(i)} y={plotH+labelH-2} fontSize="9" fill={C.muted} textAnchor={i===0?"start":i===data.length-1?"end":"middle"}>
+      {data.map((d,i)=>(i===0||i===data.length-1)&&(
+        <text key={i} x={x(i)} y={plotH+labelH-2} fontSize="9" fill={C.muted} textAnchor={i===0?"start":"end"}>
           {d.label}
         </text>
       ))}
