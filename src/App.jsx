@@ -176,25 +176,28 @@ function LineChart({data,color=C.terra,height=60}) {
   if(!data||data.length<2) return <div style={{height,display:"flex",alignItems:"center",justifyContent:"center",color:C.muted,fontSize:11}}>Not enough data</div>;
   const vals=data.map(d=>d.v);
   const min=Math.min(...vals),max=Math.max(...vals),range=max-min||1;
-  const W=300,H=height,pad=10;
+  const W=300, plotH=height, labelH=18, totalH=plotH+labelH, pad=10;
   const x=i=>pad+(i/(vals.length-1))*(W-pad*2);
-  const y=v=>H-pad-((v-min)/range)*(H-pad*2);
+  const y=v=>pad+((1-(v-min)/range)*(plotH-pad*2));
   const pts=vals.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
-  const fill=`${x(0)},${H} ${pts} ${x(vals.length-1)},${H}`;
+  const fill=`${x(0)},${plotH} ${pts} ${x(vals.length-1)},${plotH}`;
   return (
-    <div>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:H,display:"block"}}>
-        <defs><linearGradient id={`g${color.replace(/[^a-z0-9]/gi,"")}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity="0.18"/><stop offset="100%" stopColor={color} stopOpacity="0"/></linearGradient></defs>
-        <polygon points={fill} fill={`url(#g${color.replace(/[^a-z0-9]/gi,"")})`}/>
-        <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
-        {vals.map((v,i)=><circle key={i} cx={x(i)} cy={y(v)} r="3" fill={color}/>)}
-      </svg>
-      <div style={{display:"flex",justifyContent:"space-between",marginTop:4,paddingLeft:2,paddingRight:2}}>
-        {data.map((d,i)=>(
-          <span key={i} style={{fontSize:9,color:C.muted,textAlign:"center",lineHeight:1.2,maxWidth:`${100/data.length}%`,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{d.label}</span>
-        ))}
-      </div>
-    </div>
+    <svg viewBox={`0 0 ${W} ${totalH}`} style={{width:"100%",height:totalH,display:"block"}}>
+      <defs>
+        <linearGradient id={`g${color.replace(/[^a-z0-9]/gi,"")}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.18"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+      <polygon points={fill} fill={`url(#g${color.replace(/[^a-z0-9]/gi,"")})`}/>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+      {vals.map((v,i)=><circle key={i} cx={x(i)} cy={y(v)} r="3" fill={color}/>)}
+      {data.map((d,i)=>(
+        <text key={i} x={x(i)} y={plotH+labelH-2} fontSize="9" fill={C.muted} textAnchor={i===0?"start":i===data.length-1?"end":"middle"}>
+          {d.label}
+        </text>
+      ))}
+    </svg>
   );
 }
 
