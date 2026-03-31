@@ -172,7 +172,8 @@ function DeltaChip({value,inverted=false}) {
 }
 
 // ─── LINE CHART ───────────────────────────────────────────────────────────────
-function LineChart({data,color=C.terra,height=60}) {
+function LineChart({data,color=C.terra,height=60,fmtFn}) {
+  const [hovered,setHovered]=useState(null);
   if(!data||data.length<2) return <div style={{height,display:"flex",alignItems:"center",justifyContent:"center",color:C.muted,fontSize:11}}>Not enough data</div>;
   const vals=data.map(d=>d.v);
   const min=Math.min(...vals),max=Math.max(...vals),range=max-min||1;
@@ -181,23 +182,47 @@ function LineChart({data,color=C.terra,height=60}) {
   const y=v=>pad+((1-(v-min)/range)*(plotH-pad*2));
   const pts=vals.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
   const fill=`${x(0)},${plotH} ${pts} ${x(vals.length-1)},${plotH}`;
+
   return (
-    <svg viewBox={`0 0 ${W} ${totalH}`} style={{width:"100%",height:totalH,display:"block"}}>
-      <defs>
-        <linearGradient id={`g${color.replace(/[^a-z0-9]/gi,"")}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.18"/>
-          <stop offset="100%" stopColor={color} stopOpacity="0"/>
-        </linearGradient>
-      </defs>
-      <polygon points={fill} fill={`url(#g${color.replace(/[^a-z0-9]/gi,"")})`}/>
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
-      {vals.map((v,i)=><circle key={i} cx={x(i)} cy={y(v)} r="3" fill={color}/>)}
-      {data.map((d,i)=>(i===0||i===data.length-1)&&(
-        <text key={i} x={x(i)} y={plotH+labelH-2} fontSize="9" fill={C.muted} textAnchor={i===0?"start":"end"}>
-          {d.label}
-        </text>
-      ))}
-    </svg>
+    <div style={{position:"relative"}}>
+      {hovered!==null&&(()=>{
+        const d=data[hovered];
+        const cx=x(hovered);
+        const pct=(cx/W)*100;
+        const tipW=110;
+        const tipLeft=pct>70?`calc(${pct}% - ${tipW}px)`:`${pct}%`;
+        return(
+          <div style={{position:"absolute",top:0,left:tipLeft,width:tipW,background:C.navy,borderRadius:7,padding:"5px 9px",zIndex:10,pointerEvents:"none",transform:"translateY(-2px)"}}>
+            <div style={{fontSize:10,color:"rgba(255,255,255,0.6)",marginBottom:2}}>{d.label}</div>
+            <div style={{fontSize:12,fontWeight:600,color:"#fff"}}>{fmtFn?fmtFn(d.v):d.v}</div>
+          </div>
+        );
+      })()}
+      <svg viewBox={`0 0 ${W} ${totalH}`} style={{width:"100%",height:totalH,display:"block"}}>
+        <defs>
+          <linearGradient id={`g${color.replace(/[^a-z0-9]/gi,"")}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.18"/>
+            <stop offset="100%" stopColor={color} stopOpacity="0"/>
+          </linearGradient>
+        </defs>
+        <polygon points={fill} fill={`url(#g${color.replace(/[^a-z0-9]/gi,"")})`}/>
+        <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+        {vals.map((v,i)=>(
+          <g key={i}>
+            <circle cx={x(i)} cy={y(v)} r={hovered===i?5:3} fill={color} style={{transition:"r 0.1s"}}/>
+            <circle cx={x(i)} cy={y(v)} r="12" fill="transparent" style={{cursor:"crosshair"}}
+              onMouseEnter={()=>setHovered(i)}
+              onMouseLeave={()=>setHovered(null)}
+            />
+          </g>
+        ))}
+        {data.map((d,i)=>(i===0||i===data.length-1)&&(
+          <text key={i} x={x(i)} y={plotH+labelH-2} fontSize="9" fill={C.muted} textAnchor={i===0?"start":"end"}>
+            {d.label}
+          </text>
+        ))}
+      </svg>
+    </div>
   );
 }
 
@@ -216,7 +241,7 @@ function ChartCard({title,data,color,fmtFn,note}) {
         <span style={{fontSize:11,color:C.muted}}>Now: <b style={{color:color}}>{fmtFn?fmtFn(data[data.length-1].v):data[data.length-1].v}</b></span>
         <DeltaChip value={d} inverted={inv}/>
       </div>
-      <LineChart data={data} color={color} height={80}/>
+      <LineChart data={data} color={color} height={80} fmtFn={fmtFn}/>
     </div>
   );
 }
@@ -773,13 +798,13 @@ function CommandCentre({assets,onSelectAsset,onAddUpdate,onAddAsset}) {
                   {/* 3 mini sparklines */}
                   <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14}}>
                     {[
-                      {label:"Valuation",data:a.quarters.map(q=>({v:q.valuation,label:q.period})),color:C.terra},
-                      {label:"Rent",data:a.quarters.map(q=>({v:q.rent,label:q.period})),color:"#4a7c9e"},
-                      {label:"Credit score",data:a.quarters.map(q=>({v:q.creditScore,label:q.period})),color:"#6b5ea8"},
-                    ].map(({label,data,color})=>(
+                      {label:"Valuation",data:a.quarters.map(q=>({v:q.valuation,label:q.period})),color:C.terra,fmtFn:fmtM},
+                      {label:"Rent",data:a.quarters.map(q=>({v:q.rent,label:q.period})),color:"#4a7c9e",fmtFn:fmtM},
+                      {label:"Credit score",data:a.quarters.map(q=>({v:q.creditScore,label:q.period})),color:"#6b5ea8",fmtFn:v=>`${v}/100`},
+                    ].map(({label,data,color,fmtFn})=>(
                       <div key={label} style={{background:C.white,borderRadius:8,padding:"10px 12px",border:`0.5px solid ${C.border}`}}>
                         <div style={{fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{label}</div>
-                        <LineChart data={data} color={color} height={50}/>
+                        <LineChart data={data} color={color} height={50} fmtFn={fmtFn}/>
                       </div>
                     ))}
                   </div>
