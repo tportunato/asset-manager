@@ -629,15 +629,57 @@ function CommandCentre({assets,onSelectAsset,onAddUpdate,onAddAsset}) {
   const totalRent=assets.reduce((s,a)=>s+latest(a).rent,0);
   const totalDebt=assets.reduce((s,a)=>s+latest(a).loanAmount,0);
   const portWalt=assets.reduce((s,a)=>s+latest(a).walt*(latest(a).valuation/totalGAV),0);
+
+  // Build aggregated portfolio time series across all assets
+  // Collect all unique periods, sorted by first asset's period order as proxy
+  const allPeriods = [...new Set(assets.flatMap(a=>a.quarters.map(q=>q.period)))];
+  // Sort periods chronologically using a simple year+quarter key
+  const periodSort = p => {
+    const m = p.match(/Q(\d)\s*(\d{4})/);
+    return m ? parseInt(m[2])*10+parseInt(m[1]) : 0;
+  };
+  allPeriods.sort((a,b)=>periodSort(a)-periodSort(b));
+
+  // For each period, sum valuation + rent, weighted avg credit score
+  const portTimeSeries = allPeriods.map(period=>{
+    let sumVal=0, sumRent=0, wScore=0, wTotal=0, wWalt=0;
+    assets.forEach(a=>{
+      // Find the most recent quarter at or before this period
+      const sorted=[...a.quarters].filter(q=>periodSort(q.period)<=periodSort(period));
+      if(!sorted.length) return;
+      const q=sorted[sorted.length-1];
+      sumVal+=q.valuation;
+      sumRent+=q.rent;
+      if(q.creditScore){wScore+=q.creditScore*q.valuation;wTotal+=q.valuation;}
+      if(q.walt){wWalt+=q.walt*q.valuation;}
+    });
+    return {period, valuation:sumVal, rent:sumRent, creditScore:wTotal>0?wScore/wTotal:0, walt:sumVal>0?wWalt/sumVal:0};
+  }).filter(d=>d.valuation>0);
+
+  const portValData   = portTimeSeries.map(d=>({v:d.valuation,   label:d.period}));
+  const portRentData  = portTimeSeries.map(d=>({v:d.rent,        label:d.period}));
+  const portCreditData= portTimeSeries.map(d=>({v:d.creditScore, label:d.period}));
+  const portWaltData  = portTimeSeries.map(d=>({v:d.walt,        label:d.period}));
+
   return (
     <div style={{padding:"28px 32px"}}>
       <Eyebrow>Portfolio Summary</Eyebrow>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:28}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:20}}>
         <MetricCard label="Portfolio GAV" value={fmtM(totalGAV)} sub={`${assets.length} assets · 3 countries`}/>
         <MetricCard label="Total Gross Rent" value={fmtM(totalRent)} sub="per annum"/>
         <MetricCard label="Total Debt" value={fmtM(totalDebt)} sub={`Portfolio LTV: ${((totalDebt/totalGAV)*100).toFixed(1)}%`}/>
         <MetricCard label="Portfolio WALT" value={`${portWalt.toFixed(1)}y`} sub="valuation-weighted"/>
       </div>
+
+      {/* Portfolio trend charts */}
+      {portTimeSeries.length>=2&&(
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:28}}>
+          <ChartCard title="Portfolio GAV" data={portValData} color={C.terra} fmtFn={fmtM}/>
+          <ChartCard title="Portfolio Gross Rent" data={portRentData} color="#4a7c9e" fmtFn={fmtM}/>
+          <ChartCard title="Portfolio WALT" data={portWaltData} color="#3a8c6e" fmtFn={v=>`${v.toFixed(1)}y`} note="↓ = lease shortening"/>
+          <ChartCard title="Avg. Credit Score" data={portCreditData} color="#6b5ea8" fmtFn={v=>`${v.toFixed(0)}/100`} note="↓ = deterioration"/>
+        </div>
+      )}
 
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
         <Eyebrow>Asset Overview — click row to expand</Eyebrow>
