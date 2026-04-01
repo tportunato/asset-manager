@@ -831,78 +831,76 @@ function AssetView({assets,setAssets,initialAsset,openModal,onAddAsset}) {
   const a=assets.find(x=>x.id===selId)||assets[0];
   const l=latest(a);
 
-  function addQuarter(assetId,row) {
-    setAssets(prev=>prev.map(x=>x.id===assetId?{...x,quarters:[...x.quarters,row]}:x));
-  }
+  const [uploadModal,setUploadModal]=useState(null); // null | "csv" | "ai"
+  const csvFileRef=useRef();
+  const aiFileRef=useRef();
 
-  // Sample CSV for demo download — uses intentionally non-standard French column names
-  const DEMO_CSV = `Actif;Locataire;Surface_GLA_m2;Prix_Acquisition_EUR;Estimation_Valeur_EUR;Loyer_Annuel_EUR;ERV_par_m2;Taux_Capitalisation_Pct;WALT_annees;WALB_annees;Encours_Dette_EUR;Preteur;Echeance_Pret;LTV_Pct;ICR;Score_Credit;Notation_Credit;Indexation;Notes
-Lyon Nord Extension;Renault Trucks SAS;2200;1850000;2100000;138000;63;5.40;3.8;1.9;980000;Crédit Agricole;2027-09-30;46.7;1.68;80;A-;100% ILC;Newly leased annex unit adjacent to main warehouse`;
+  // ── TEMPLATE CSV ──
+  const TEMPLATE_CSV=`period,valuation,rent,erv,capRate,walt,walb,ltv,icr,loanAmount,creditScore,creditRating,tenantName
+Q2 2025,11500000,735000,120,5.25,3.9,2.0,33.7,1.74,3880000,81,A-,Renault Trucks SAS`;
 
-  function downloadDemoCsv() {
-    const blob = new Blob([DEMO_CSV], {type:"text/csv"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href=url; a.download="demo_asset_import.csv"; a.click();
+  function downloadTemplate(){
+    const blob=new Blob([TEMPLATE_CSV],{type:"text/csv"});
+    const url=URL.createObjectURL(blob);
+    const el=document.createElement("a");el.href=url;el.download="asset_update_template.csv";el.click();
     URL.revokeObjectURL(url);
   }
 
-  async function handleCsv(e) {
-    const file=e.target.files[0]; if(!file) return;
-    setCsvState("parsing");
+  // ── PLAIN CSV HANDLER ──
+  async function handlePlainCsv(e){
+    const file=e.target.files[0];if(!file)return;
+    setUploadModal(null);
     const text=await file.text();
-    try {
-      const prompt=`You are a real estate analyst. A user has uploaded a CSV file with non-standard column names (possibly in French, Italian, Dutch, or any other format). Your task is to interpret the column headers and map the data to our standard data model regardless of language or naming conventions.
-
-Standard fields to extract:
-- tenantName: name of the tenant/occupier
-- creditRating: credit rating string (e.g. "A-", "BBB+")
-- creditScore: numeric score 0-100
-- gla: gross lettable area in sqm
-- acquisitionPrice: purchase price in €
-- valuation: current appraised value in €
-- rent / annualRent: annual passing rent in €
-- erv: estimated rental value per sqm
-- walt: weighted average lease term in years
-- walb: weighted average lease break in years
-- loanAmount: outstanding debt in €
-- lender: name of lending bank
-- loanExpiry: loan maturity date
-- ltv: loan-to-value ratio as %
-- icr: interest coverage ratio
-- capRate: capitalisation rate as %
-- indexation: rent indexation clause
-- notes: any free-text observations
-
-CSV content:
-${text.slice(0,4000)}
-
-Respond ONLY with raw JSON in exactly this format — no preamble, no markdown:
-{
-  "mapped": { "fieldName": "value or null", ... },
-  "columnMappings": { "original CSV column": "our field name", ... },
-  "missing": ["field names not found"],
-  "summary": "1-2 sentence description of what was in the CSV and any interpretation decisions made"
-}`;
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
-      const d=await res.json();
-      const parsed=JSON.parse(d.content[0].text.replace(/```json|```/g,"").trim());
-      setCsvResult(parsed); setCsvState("done");
-    } catch { setCsvState("error"); }
+    try{
+      const rows=text.trim().split("\n");
+      const headers=rows[0].split(",").map(h=>h.trim().toLowerCase());
+      const vals=rows[1]?.split(",").map(v=>v.trim())||[];
+      const obj={};headers.forEach((h,i)=>{obj[h]=vals[i]||"";});
+      const numF=["valuation","rent","erv","caprate","walt","walb","ltv","icr","loanamount","creditscore"];
+      const newQ={...l};
+      if(obj.period) newQ.period=obj.period;
+      if(obj.valuation) newQ.valuation=parseFloat(obj.valuation);
+      if(obj.rent) newQ.rent=parseFloat(obj.rent);
+      if(obj.erv) newQ.erv=parseFloat(obj.erv);
+      if(obj.caprate) newQ.capRate=parseFloat(obj.caprate);
+      if(obj.walt) newQ.walt=parseFloat(obj.walt);
+      if(obj.walb) newQ.walb=parseFloat(obj.walb);
+      if(obj.ltv) newQ.ltv=parseFloat(obj.ltv);
+      if(obj.icr) newQ.icr=parseFloat(obj.icr);
+      if(obj.loanamount) newQ.loanAmount=parseFloat(obj.loanamount);
+      if(obj.creditscore) newQ.creditScore=parseFloat(obj.creditscore);
+      if(obj.creditrating) newQ.creditRating=obj.creditrating;
+      if(obj.tenantname) newQ.tenantName=obj.tenantname;
+      setAssets(prev=>prev.map(x=>x.id===a.id?{...x,quarters:[...x.quarters,newQ]}:x));
+    }catch{setCsvState("error");}
     e.target.value="";
   }
 
-  function applyImport() {
-    if(!csvResult?.mapped) return;
-    const m=csvResult.mapped; const newQ={...l};
-    const numFields=["valuation","rent","annualRent","capRate","walt","walb","ltv","icr","erv","loanAmount","creditScore"];
-    Object.entries(m).forEach(([k,v])=>{if(v!=null){if(numFields.includes(k))newQ[k]=parseFloat(v);else newQ[k]=v;}});
-    if(m.annualRent) newQ.rent=m.annualRent;
-    if(m.tenantRating) newQ.creditRating=m.tenantRating;
-    if(m.tenantScore) newQ.creditScore=parseFloat(m.tenantScore);
-    newQ.period="CSV Import";
-    setAssets(prev=>prev.map(x=>x.id===a.id?{...x,quarters:[...x.quarters,newQ]}:x));
-    setCsvState("idle"); setCsvResult(null);
+  // ── AI CSV/PDF HANDLER ──
+  async function handleAiUpload(e,type){
+    const file=e.target.files[0];if(!file)return;
+    setUploadModal(null);setCsvState("parsing");
+    let content="";
+    if(type==="pdf"){
+      // base64 encode for Claude vision
+      const buf=await file.arrayBuffer();
+      const bytes=new Uint8Array(buf);
+      let b64="";bytes.forEach(b=>{b64+=String.fromCharCode(b);});
+      content=btoa(b64);
+    }else{
+      content=await file.text();
+    }
+    try{
+      const userContent=type==="pdf"
+        ?[{type:"document",source:{type:"base64",media_type:"application/pdf",data:content}},{type:"text",text:`Extract quarterly asset management data from this document. Fields: tenantName, creditRating, creditScore(0-100), valuation(€), rent/annualRent(€/yr), erv(€/sqm), walt(years), walb(years), loanAmount(€), lender, loanExpiry, ltv(%), icr, capRate(%), indexation, notes. Respond ONLY with raw JSON: {"mapped":{...},"columnMappings":{...},"missing":[...],"summary":"1-2 sentences"}`}]
+        :`You are a real estate analyst. A user has uploaded a CSV file with non-standard column names (possibly in French, Italian, Dutch, or any other format). Extract quarterly asset management data and map it regardless of column naming or language.\n\nStandard fields:\n- tenantName, creditRating, creditScore(0-100), valuation(€), rent/annualRent(€/yr), erv(€/sqm), walt(years), walb(years), loanAmount(€), lender, loanExpiry, ltv(%), icr, capRate(%), indexation, notes\n\nCSV:\n${content.slice(0,4000)}\n\nRespond ONLY with raw JSON: {"mapped":{...},"columnMappings":{"original CSV column":"our field name",...},"missing":[...],"summary":"1-2 sentences"}`;
+      const body={model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:userContent}]};
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      const d=await res.json();
+      const parsed=JSON.parse(d.content[0].text.replace(/```json|```/g,"").trim());
+      setCsvResult(parsed);setCsvState("done");
+    }catch{setCsvState("error");}
+    e.target.value="";
   }
 
   const charts=[
@@ -917,6 +915,79 @@ Respond ONLY with raw JSON in exactly this format — no preamble, no markdown:
 
   return (
     <div style={{padding:"28px 32px"}}>
+      {/* Hidden file inputs */}
+      <input ref={csvFileRef} type="file" accept=".csv" style={{display:"none"}} onChange={handlePlainCsv}/>
+      <input ref={aiFileRef} type="file" accept=".csv,.pdf" style={{display:"none"}} onChange={e=>handleAiUpload(e, e.target.files[0]?.name?.endsWith(".pdf")?"pdf":"csv")}/>
+
+      {/* Upload CSV Modal */}
+      {uploadModal==="csv"&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(15,39,68,0.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setUploadModal(null)}>
+          <div style={{background:C.white,borderRadius:14,width:460,overflow:"hidden"}} onClick={e=>e.stopPropagation()}>
+            <div style={{background:C.navy,padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+              <div>
+                <div style={{fontSize:15,fontWeight:600,color:"#fff",marginBottom:3}}>Upload Deal Data</div>
+                <div style={{fontSize:12,color:"rgba(255,255,255,0.55)"}}>CSV must match Asset Manager template format exactly</div>
+              </div>
+              <button onClick={()=>setUploadModal(null)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:18,cursor:"pointer",padding:2}}>×</button>
+            </div>
+            <div style={{padding:"20px"}}>
+              <div
+                onClick={()=>csvFileRef.current.click()}
+                style={{border:`1.5px dashed ${C.border}`,borderRadius:10,padding:"32px 20px",textAlign:"center",cursor:"pointer",background:C.offWhite,marginBottom:16}}
+                onMouseEnter={e=>e.currentTarget.style.borderColor=C.terra}
+                onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
+                <div style={{fontSize:14,fontWeight:500,color:C.navy,marginBottom:6}}>Drop file here or click to browse</div>
+                <div style={{fontSize:12,color:C.muted}}>CSV · Columns must match template</div>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <button onClick={downloadTemplate} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 14px",borderRadius:8,border:`1.5px solid ${C.terra}`,background:C.white,color:C.terra,cursor:"pointer"}}>↓ Download Template</button>
+                <button onClick={()=>setUploadModal(null)} style={{fontFamily:"inherit",fontSize:12,padding:"7px 14px",borderRadius:8,border:`1px solid ${C.border}`,background:C.white,color:C.body,cursor:"pointer"}}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Upload Modal */}
+      {uploadModal==="ai"&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(15,39,68,0.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setUploadModal(null)}>
+          <div style={{background:C.white,borderRadius:14,width:480,overflow:"hidden"}} onClick={e=>e.stopPropagation()}>
+            <div style={{background:C.navy,padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
+                  <span style={{fontSize:15,fontWeight:600,color:"#fff"}}>✦ AI Upload</span>
+                  <span style={{fontSize:10,fontWeight:600,background:C.terra,color:"#fff",padding:"2px 7px",borderRadius:20,letterSpacing:"0.06em"}}>DEMO</span>
+                </div>
+                <div style={{fontSize:12,color:"rgba(255,255,255,0.55)"}}>Claude maps your file to asset data fields automatically</div>
+              </div>
+              <button onClick={()=>setUploadModal(null)} style={{background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:18,cursor:"pointer",padding:2}}>×</button>
+            </div>
+            <div style={{padding:"20px"}}>
+              <div style={{fontSize:12,color:C.muted,marginBottom:14}}>Choose your source format:</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+                {[
+                  {id:"csv",icon:"📊",title:"CSV / Excel",desc:"Any column names — Claude maps to asset fields automatically"},
+                  {id:"pdf",icon:"📄",title:"PDF",desc:"Valuation report, lease summary or asset factsheet — high-confidence fields only"},
+                ].map(opt=>(
+                  <button key={opt.id}
+                    onClick={()=>{setUploadModal(null);aiFileRef.current.accept=opt.id==="pdf"?".pdf":".csv";setTimeout(()=>aiFileRef.current.click(),50);}}
+                    style={{fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center",gap:8,padding:"20px 14px",borderRadius:10,border:`0.5px solid ${C.border}`,background:C.white,cursor:"pointer"}}
+                    onMouseEnter={e=>e.currentTarget.style.background=C.offWhite}
+                    onMouseLeave={e=>e.currentTarget.style.background=C.white}>
+                    <span style={{fontSize:28}}>{opt.icon}</span>
+                    <div style={{fontSize:13,fontWeight:600,color:C.navy}}>{opt.title}</div>
+                    <div style={{fontSize:11,color:C.muted,lineHeight:1.5}}>{opt.desc}</div>
+                  </button>
+                ))}
+              </div>
+              <div style={{textAlign:"right"}}>
+                <button onClick={()=>setUploadModal(null)} style={{fontFamily:"inherit",fontSize:12,padding:"7px 14px",borderRadius:8,border:`1px solid ${C.border}`,background:C.white,color:C.body,cursor:"pointer"}}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Controls */}
       <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:22}}>
         <select value={selId} onChange={e=>setSelId(+e.target.value)} style={{fontFamily:"inherit",fontSize:13,padding:"6px 12px",borderRadius:8,border:`0.5px solid ${C.border}`,background:C.white,color:C.navy,cursor:"pointer"}}>
@@ -924,36 +995,23 @@ Respond ONLY with raw JSON in exactly this format — no preamble, no markdown:
         </select>
         <Badge scheme={healthOf(a)==="ok"?"success":healthOf(a)==="warning"?"warning":"danger"}>{healthOf(a)==="ok"?"Clean":healthOf(a)==="warning"?"Watch":"Flag"}</Badge>
         <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
-          <input ref={fileRef} type="file" accept=".csv" style={{display:"none"}} onChange={handleCsv}/>
-          <button onClick={downloadDemoCsv} style={{fontFamily:"inherit",fontSize:11,padding:"6px 12px",borderRadius:8,border:`0.5px solid ${C.border}`,background:C.white,color:C.muted,cursor:"pointer"}}>↓ Sample CSV</button>
-          <button onClick={()=>fileRef.current.click()} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 14px",borderRadius:8,border:`1.5px solid ${C.terra}`,background:C.white,color:C.terra,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
-            <span style={{fontSize:12,color:C.terra}}>✦</span> AI Import CSV
+          <button onClick={()=>setUploadModal("csv")} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 14px",borderRadius:8,border:`1px solid ${C.border}`,background:C.white,color:C.body,cursor:"pointer"}}>↑ Upload CSV</button>
+          <button onClick={()=>setUploadModal("ai")} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 14px",borderRadius:8,border:`1.5px solid ${C.terra}`,background:C.white,color:C.terra,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+            <span style={{fontSize:12}}>✦</span> AI Upload
           </button>
           <button onClick={()=>openModal(a)} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 16px",borderRadius:8,border:`1.5px solid ${C.terra}`,background:C.white,color:C.terra,cursor:"pointer"}}>+ Q Update</button>
           <button onClick={onAddAsset} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 16px",borderRadius:8,border:"none",background:C.terra,color:"#fff",cursor:"pointer"}}>+ Add Asset</button>
         </div>
       </div>
 
-      {/* AI Import explainer callout — always visible when idle */}
-      {csvState==="idle"&&(
-        <div style={{background:C.terraLight,border:`0.5px solid #e8c4a8`,borderRadius:10,padding:"12px 18px",marginBottom:18,display:"flex",alignItems:"flex-start",gap:12}}>
-          <span style={{fontSize:18,marginTop:1}}>✦</span>
-          <div>
-            <div style={{fontSize:12,fontWeight:600,color:C.terraDark,marginBottom:3}}>AI-powered CSV interpretation</div>
-            <div style={{fontSize:12,color:C.terraDark,lineHeight:1.6}}>Upload any asset data CSV — any column naming, any language. Claude reads the headers, infers what each column means, and maps the data to the correct fields. Non-standard names like <i>Estimation_Valeur_EUR</i> or <i>Tasso_Capitalizzazione</i> are handled automatically. Missing fields are flagged for manual entry.</div>
-            <div style={{marginTop:8,fontSize:11,color:C.terraDark,opacity:0.75}}>Download the sample CSV above to see a demo with intentionally non-standard French column names.</div>
-          </div>
-        </div>
-      )}
-
-      {/* Parsing animation */}
+      {/* AI parsing animation */}
       {csvState==="parsing"&&(
         <div style={{background:C.info.bg,border:`0.5px solid #b8cde0`,borderRadius:10,padding:"16px 20px",marginBottom:18}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
             <span style={{fontSize:16,color:C.info.text}}>✦</span>
-            <div style={{fontSize:13,fontWeight:600,color:C.info.text}}>Claude is reading your CSV…</div>
+            <div style={{fontSize:13,fontWeight:600,color:C.info.text}}>Claude is reading your file…</div>
           </div>
-          {["Parsing column headers","Inferring field meanings across languages","Mapping to asset data model","Identifying missing fields"].map((step,i)=>(
+          {["Parsing content and structure","Inferring field meanings across languages","Mapping to asset data model","Identifying missing fields"].map((step,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:12,color:C.info.text,opacity:0.85}}>
               <span style={{fontSize:10}}>→</span>{step}
             </div>
@@ -961,11 +1019,10 @@ Respond ONLY with raw JSON in exactly this format — no preamble, no markdown:
         </div>
       )}
 
-      {csvState==="error"&&<div style={{background:C.danger.bg,borderRadius:10,padding:"12px 18px",marginBottom:18,fontSize:12,color:C.danger.text}}>Could not parse CSV — check the file format and try again.</div>}
+      {csvState==="error"&&<div style={{background:C.danger.bg,borderRadius:10,padding:"12px 18px",marginBottom:18,fontSize:12,color:C.danger.text}}>Could not parse file — check the format and try again.</div>}
 
       {csvState==="done"&&csvResult&&(
         <div style={{background:C.white,border:`0.5px solid ${C.border}`,borderRadius:10,padding:"20px",marginBottom:20}}>
-          {/* Header */}
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14,paddingBottom:12,borderBottom:`0.5px solid ${C.border}`}}>
             <div>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
@@ -976,14 +1033,12 @@ Respond ONLY with raw JSON in exactly this format — no preamble, no markdown:
               <div style={{fontSize:12,color:C.body}}>{csvResult.summary}</div>
             </div>
           </div>
-
-          {/* Column mapping — the key AI demo moment */}
           {csvResult.columnMappings&&Object.keys(csvResult.columnMappings).length>0&&(
             <div style={{marginBottom:16}}>
               <div style={{fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.07em",color:C.muted,marginBottom:8}}>Column interpretation — how Claude read your headers</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:"4px 10px",alignItems:"center"}}>
-                <div style={{fontSize:10,fontWeight:600,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",paddingBottom:4,borderBottom:`0.5px solid ${C.border}`}}>Your CSV column</div>
-                <div style={{fontSize:10,color:C.muted,paddingBottom:4,borderBottom:`0.5px solid ${C.border}`}}></div>
+                <div style={{fontSize:10,fontWeight:600,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",paddingBottom:4,borderBottom:`0.5px solid ${C.border}`}}>Your column</div>
+                <div style={{paddingBottom:4,borderBottom:`0.5px solid ${C.border}`}}/>
                 <div style={{fontSize:10,fontWeight:600,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",paddingBottom:4,borderBottom:`0.5px solid ${C.border}`}}>Mapped to</div>
                 {Object.entries(csvResult.columnMappings).map(([orig,mapped])=>(
                   <>
@@ -995,7 +1050,6 @@ Respond ONLY with raw JSON in exactly this format — no preamble, no markdown:
               </div>
             </div>
           )}
-
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
             <div>
               <div style={{fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.07em",color:C.muted,marginBottom:8}}>Extracted values</div>
@@ -1015,7 +1069,18 @@ Respond ONLY with raw JSON in exactly this format — no preamble, no markdown:
             </div>
           </div>
           <div style={{display:"flex",gap:8}}>
-            <button onClick={applyImport} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 16px",borderRadius:8,border:"none",background:C.terra,color:"#fff",cursor:"pointer"}}>Apply to {a.name}</button>
+            <button onClick={()=>{
+              if(!csvResult?.mapped) return;
+              const m=csvResult.mapped;const newQ={...l};
+              const numFields=["valuation","rent","annualRent","capRate","walt","walb","ltv","icr","erv","loanAmount","creditScore"];
+              Object.entries(m).forEach(([k,v])=>{if(v!=null){if(numFields.includes(k))newQ[k]=parseFloat(v);else newQ[k]=v;}});
+              if(m.annualRent) newQ.rent=m.annualRent;
+              if(m.tenantRating) newQ.creditRating=m.tenantRating;
+              if(m.tenantScore) newQ.creditScore=parseFloat(m.tenantScore);
+              newQ.period="AI Import";
+              setAssets(prev=>prev.map(x=>x.id===a.id?{...x,quarters:[...x.quarters,newQ]}:x));
+              setCsvState("idle");setCsvResult(null);
+            }} style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 16px",borderRadius:8,border:"none",background:C.terra,color:"#fff",cursor:"pointer"}}>Apply to {a.name}</button>
             <button onClick={()=>{setCsvState("idle");setCsvResult(null);}} style={{fontFamily:"inherit",fontSize:12,padding:"7px 14px",borderRadius:8,border:`1px solid ${C.border}`,background:C.white,color:C.body,cursor:"pointer"}}>Discard</button>
           </div>
         </div>
