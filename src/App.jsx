@@ -1456,14 +1456,127 @@ function AlertsTab({assets}) {
   );
 }
 
+// ─── LANDING ──────────────────────────────────────────────────────────────────
+const LOGO="https://res.cloudinary.com/dsgfts9gp/image/upload/Gemini_Generated_Image_uao02uao02uao02u-remove-bg-io_mb5sys.png";
+
+const STEPS=[
+  {num:"01",label:"Command Centre",desc:"Portfolio-level KPIs, aggregated trend charts and expandable asset rows — the daily check-in view.",ai:false},
+  {num:"02",label:"Asset View",desc:"Per-asset drill-down with 7 quarterly history charts, tenancy and financing detail, and AI-powered data import.",ai:true},
+  {num:"03",label:"AI Briefing",desc:"Claude generates a structured analyst note per asset or full portfolio — situation, risks, positives and recommended actions.",ai:true},
+  {num:"04",label:"Alerts",desc:"Automatic flags for loan maturity, credit deterioration, WALT thresholds and ICR covenant proximity — sorted by urgency.",ai:false},
+];
+
+const FEATURES=[
+  {label:"Quarterly data history",desc:"Track valuation, rent, cap rate, ERV, credit score, LTV and ICR across every period — with line charts and a period-by-period table."},
+  {label:"Smart alert engine",desc:"Seven alert types fire automatically — refinancing timelines, credit score drops, WALT shortening, ICR covenant proximity and more."},
+  {label:"AI Import — CSV & PDF",desc:"Upload a data export or valuation report in any format or language. Claude reads the headers, maps the fields and flags what's missing."},
+  {label:"Portfolio-level aggregation",desc:"GAV, gross rent, WALT and average credit score trended across all assets — valuation-weighted, updated with every quarterly input."},
+];
+
+function Landing({onStart}) {
+  const [hov,setHov]=useState(false);
+  return (
+    <div style={{minHeight:"100vh",background:C.white,fontFamily:"'DM Sans',sans-serif",display:"flex",flexDirection:"column"}}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+      {/* Nav */}
+      <header style={{background:C.navy,height:56,padding:"0 48px",display:"flex",alignItems:"center",flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <img src={LOGO} alt="" style={{height:34,width:34,objectFit:"contain"}}/>
+          <div style={{width:"0.5px",height:16,background:"rgba(255,255,255,0.15)"}}/>
+          <span style={{fontSize:13,fontWeight:600,color:"#fff",letterSpacing:"0.01em"}}>Asset Manager</span>
+          <div style={{width:4,height:4,borderRadius:"50%",background:C.terra}}/>
+          <span style={{fontSize:9,fontWeight:600,letterSpacing:"0.09em",color:"rgba(255,255,255,0.3)",textTransform:"uppercase"}}>RE Portfolio Intelligence</span>
+        </div>
+      </header>
+      {/* Hero */}
+      <div style={{background:C.navy,padding:"100px 48px 110px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center"}}>
+        <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.1em",color:"rgba(255,255,255,0.35)",textTransform:"uppercase",marginBottom:28}}>Asset Management Tool</div>
+        <h1 style={{fontSize:40,fontWeight:600,color:"#fff",margin:"0 0 20px",letterSpacing:"-0.025em",lineHeight:1.15,maxWidth:580}}>
+          Portfolio oversight,<br/>built for the asset manager.
+        </h1>
+        <p style={{fontSize:15,color:"rgba(255,255,255,0.5)",margin:"0 0 48px",maxWidth:460,lineHeight:1.7,fontWeight:400}}>
+          Track valuation, rent, credit and financing across every asset in your fund — with quarterly history, smart alerts, and AI-generated briefings on demand.
+        </p>
+        <button
+          onClick={onStart}
+          onMouseEnter={()=>setHov(true)}
+          onMouseLeave={()=>setHov(false)}
+          style={{padding:"12px 28px",background:hov?"#A85520":C.terra,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",letterSpacing:"0.01em",transition:"background 0.15s",fontFamily:"inherit"}}>
+          Get Started →
+        </button>
+        <div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:14}}>Pre-loaded with 5 fictionalised logistics assets</div>
+      </div>
+      {/* Steps */}
+      <div style={{background:C.white,padding:"80px 48px"}}>
+        <div style={{maxWidth:900,margin:"0 auto"}}>
+          <div style={{fontSize:10,fontWeight:600,letterSpacing:"0.1em",color:"#aaa",textTransform:"uppercase",marginBottom:48,textAlign:"center"}}>Four screens</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"0 40px"}}>
+            {STEPS.map(s=>(
+              <div key={s.num}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+                  <span style={{fontSize:11,fontWeight:500,color:C.terra,fontFamily:"monospace"}}>{s.num}</span>
+                  {s.ai&&<span style={{fontSize:9,fontWeight:600,letterSpacing:"0.07em",textTransform:"uppercase",color:C.terraDark,background:C.terraLight,padding:"2px 7px",borderRadius:20}}>AI</span>}
+                </div>
+                <div style={{borderTop:`0.5px solid ${C.border}`,paddingTop:20}}>
+                  <div style={{fontSize:15,fontWeight:500,color:C.navy,marginBottom:10}}>{s.label}</div>
+                  <div style={{fontSize:13,color:C.muted,lineHeight:1.65}}>{s.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Features */}
+      <div style={{background:C.offWhite,padding:"64px 48px"}}>
+        <div style={{maxWidth:900,margin:"0 auto"}}>
+          <div style={{fontSize:10,fontWeight:600,letterSpacing:"0.1em",color:"#aaa",textTransform:"uppercase",marginBottom:40,textAlign:"center"}}>What's inside</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"32px 64px"}}>
+            {FEATURES.map(f=>(
+              <div key={f.label} style={{borderTop:`0.5px solid ${C.border}`,paddingTop:20}}>
+                <div style={{fontSize:13,fontWeight:500,color:C.navy,marginBottom:6}}>{f.label}</div>
+                <div style={{fontSize:13,color:C.muted,lineHeight:1.6}}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* AI strip */}
+      <div style={{background:C.navy,padding:"48px"}}>
+        <div style={{maxWidth:900,margin:"0 auto",display:"flex",alignItems:"flex-start",gap:80}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:10,fontWeight:600,letterSpacing:"0.1em",color:C.terra,textTransform:"uppercase",marginBottom:16}}>AI features</div>
+            <div style={{fontSize:15,fontWeight:500,color:"#fff",marginBottom:12,lineHeight:1.4}}>Claude acts as a second analyst on every asset in your portfolio</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",lineHeight:1.7}}>Briefings, data import mapping and Q&A are pre-computed in demo mode. Connect a Claude API key to enable live generation from your own portfolio data — no data is transmitted externally in demo mode.</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:38,flexShrink:0}}>
+            {["AI Briefing — per asset and full portfolio","Ask the Portfolio — free-text Q&A","AI Upload — CSV and PDF interpretation","Add Asset — AI-assisted onboarding"].map(f=>(
+              <div key={f} style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:3,height:3,borderRadius:"50%",background:C.terra}}/>
+                <span style={{fontSize:12,color:"rgba(255,255,255,0.5)"}}>{f}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Footer */}
+      <div style={{background:C.white,padding:"24px 48px",borderTop:`0.5px solid ${C.border}`}}>
+        <div style={{fontSize:11,color:"#cccccc",textAlign:"center"}}>Asset Manager · RE Portfolio Intelligence · Built by Tomaso Portunato</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
+  const [started,setStarted]=useState(false);
   const [tab,setTab]=useState("command");
   const [assets,setAssets]=useState(INIT_ASSETS);
   const [jumpAsset,setJumpAsset]=useState(null);
   const [modalAsset,setModalAsset]=useState(null);
   const [addAssetOpen,setAddAssetOpen]=useState(false);
   const alerts=alertsFor(assets);
+
+  if(!started) return <Landing onStart={()=>setStarted(true)}/>;
 
   function addQuarter(assetId,row) {
     setAssets(prev=>prev.map(a=>a.id===assetId?{...a,quarters:[...a.quarters,row]}:a));
