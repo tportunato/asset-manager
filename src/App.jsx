@@ -1361,7 +1361,7 @@ Q2 2025,11500000,735000,120,5.25,3.9,2.0,33.7,1.74,3880000,81,A-,Renault Trucks 
           </table>
         </div>
       </div>
-      </div>{/* end overview tab */}
+      </div>
     </div>
   );
 }
