@@ -822,9 +822,188 @@ function CommandCentre({assets,onSelectAsset,onAddUpdate,onAddAsset}) {
   );
 }
 
+// ─── PRE-GENERATED NEWS ───────────────────────────────────────────────────────
+const NEWS_DATA = {
+  portfolio: [
+    {cat:"Logistics RE Market",date:"Dec 2024",headline:"European logistics vacancy edges up to 4.8% as new supply outpaces absorption",source:"JLL European Research",relevance:"Affects yield assumptions across all five assets. Cap rate expansion risk remains elevated in NL and FR.",flag:"warning"},
+    {cat:"Macro / Rates",date:"Dec 2024",headline:"ECB holds rates at 3.15% — first pause after six consecutive cuts since Sept 2024",source:"ECB Press Release",relevance:"Euribor stabilisation reduces refinancing cost uncertainty for Milan Est and Rotterdam Gate facilities.",flag:"info"},
+    {cat:"Regulatory / Policy",date:"Nov 2024",headline:"EU Carbon Border Adjustment Mechanism tightens ESG disclosure requirements for real assets",source:"European Commission",relevance:"EPC upgrade requirements now mandatory for assets seeking refinancing from major lenders. Affects Bordeaux Sud and Milan Est.",flag:"warning"},
+    {cat:"Logistics RE Market",date:"Nov 2024",headline:"Prime logistics rents in Paris region stable at €62/sqm — Lyon shows modest +2% YoY",source:"CBRE European Logistics Outlook",relevance:"Supports ERV assumptions at Lyon Nord. No material reversion risk at current passing rent levels.",flag:"info"},
+    {cat:"Macro / Rates",date:"Oct 2024",headline:"Euribor 3M settles at 2.9% following ECB rate path revision",source:"Bloomberg / ECB",relevance:"Reduces all-in cost of debt for floating-rate facilities. Lyon Nord (260bps + E3M) benefits most.",flag:"success"},
+  ],
+  1: [ // Lyon Nord — Renault Trucks SAS
+    {cat:"Tenant News",date:"Dec 2024",headline:"Renault Trucks reports Q3 operating margin of 6.2% — in line with FY guidance",source:"Renault Group IR",relevance:"No deterioration in standalone financials. A- credit profile remains stable.",flag:"info"},
+    {cat:"Tenant News",date:"Nov 2024",headline:"Renault Trucks awarded €380m French army logistics contract — largest in 10 years",source:"Les Echos",relevance:"Contract secures logistics network demand through 2031. Positive for lease renewal probability at Lyon Nord.",flag:"success"},
+    {cat:"Country — FR",date:"Nov 2024",headline:"French industrial vacancy rate rises to 5.2% in Lyon metropolitan area",source:"BNP Paribas Real Estate France",relevance:"Broader market softening but Lyon Nord remains well-located. ERV headroom limited near-term.",flag:"warning"},
+    {cat:"Tenant News",date:"Oct 2024",headline:"Renault Group announces EV transition plan — Trucks division to remain combustion-focused through 2030",source:"Renault Group Press",relevance:"Reduces operational disruption risk. Logistics network investment likely to continue at current scale.",flag:"success"},
+    {cat:"Logistics RE Market",date:"Oct 2024",headline:"ILAT index Q3 2024 published — +1.8% YoY, below H1 pace",source:"INSEE / CBRE",relevance:"Indexation uplift at Lyon Nord will be lower than prior year. Rent growth moderating.",flag:"info"},
+  ],
+  2: [ // Milan Est — DHL Supply Chain
+    {cat:"Tenant News",date:"Dec 2024",headline:"DHL Group FY2024 guidance reiterated — EBIT €6.2bn, logistics volumes recovering in H2",source:"DHL Group IR",relevance:"AA- credit profile reaffirmed. No covenant risk at Milan Est.",flag:"success"},
+    {cat:"Country — IT",date:"Dec 2024",headline:"Northern Italy logistics take-up reaches 2.1m sqm in 2024 — second strongest year on record",source:"Colliers Italy",relevance:"Strong occupier demand supports ERV at current levels. Re-letting risk low if DHL exercises 2028 break.",flag:"success"},
+    {cat:"Tenant News",date:"Nov 2024",headline:"DHL Supply Chain expands Italian network — new hub in Piacenza, 450 new hires",source:"Corriere della Sera",relevance:"Network expansion confirms long-term Italian logistics commitment. Positive for lease renewal prospects.",flag:"success"},
+    {cat:"Regulatory / Policy",date:"Nov 2024",headline:"Italy extends PNRR logistics infrastructure funding to 2026 — €1.4bn earmarked for northern hubs",source:"Ministero delle Infrastrutture",relevance:"Policy tailwind for logistics asset values in Lombardia corridor.",flag:"info"},
+    {cat:"Macro / Rates",date:"Oct 2024",headline:"BNP Paribas RE publishes 2025 Italian logistics debt outlook — refinancing conditions improving",source:"BNP Paribas Real Estate",relevance:"Relevant to Milan Est refinancing process (Dec 2026 maturity). Lender appetite for quality assets remains strong.",flag:"info"},
+  ],
+  3: [ // Rotterdam Gate — Geodis BV
+    {cat:"Tenant News",date:"Dec 2024",headline:"Geodis parent SNCF Logistics reports €180m H1 operating loss — restructuring programme confirmed",source:"SNCF Logistics IR",relevance:"Parent company financial stress increases subsidiary risk. Geodis BV break option (Jan 2026) becomes more likely to be exercised.",flag:"danger"},
+    {cat:"Tenant News",date:"Nov 2024",headline:"Geodis announces 12% global workforce reduction — European operations most affected",source:"Reuters",relevance:"Direct operational risk. Rotterdam Gate exposure is material — begin lease renewal dialogue immediately.",flag:"danger"},
+    {cat:"Country — NL",date:"Nov 2024",headline:"Rotterdam logistics vacancy rises to 6.1% — highest since 2020 as new supply delivers",source:"JLL Netherlands",relevance:"Re-letting risk elevated if Geodis exits. Target ERV of €88/sqm may require discount in current market.",flag:"warning"},
+    {cat:"Macro / Rates",date:"Oct 2024",headline:"ABN AMRO Q3 results — real estate lending book stable, no covenant enforcement activity reported",source:"ABN AMRO IR",relevance:"Lender relationship risk low. Extension facility discussion should be constructive.",flag:"info"},
+    {cat:"Logistics RE Market",date:"Oct 2024",headline:"Port of Rotterdam throughput -3.2% YoY — container volumes recovering but below 2022 peak",source:"Port of Rotterdam Authority",relevance:"Macro headwind for logistics occupiers near the port. Consistent with Geodis volume softness.",flag:"warning"},
+  ],
+  4: [ // Bordeaux Sud — Kuehne+Nagel SAS
+    {cat:"Tenant News",date:"Dec 2024",headline:"Kuehne+Nagel FY2024 operating profit CHF 1.6bn — France contract logistics division grows 4%",source:"Kuehne+Nagel IR",relevance:"Stable financials. A rating and 87/100 credit score well-supported.",flag:"success"},
+    {cat:"Country — FR",date:"Nov 2024",headline:"Bordeaux metropolitan logistics market — vacancy stable at 3.8%, limited new supply pipeline",source:"Knight Frank France",relevance:"Tight supply supports ERV stability. Low re-letting risk at lease expiry.",flag:"success"},
+    {cat:"Regulatory / Policy",date:"Nov 2024",headline:"ZAN (Zéro Artificialisation Nette) law enforcement tightens in Gironde — new logistics permits restricted",source:"Préfecture de la Gironde",relevance:"Limits new competing supply near Bordeaux Sud. Scarcity value of existing assets increases.",flag:"success"},
+    {cat:"Tenant News",date:"Oct 2024",headline:"Kuehne+Nagel expands FNAC Darty contract in France — Bordeaux hub to serve South-West operations",source:"Kuehne+Nagel Press",relevance:"Confirms operational importance of Bordeaux Sud location. Renewal probability at 2028 break option very high.",flag:"success"},
+    {cat:"Logistics RE Market",date:"Oct 2024",headline:"ILAT indexation Q3 2024 — +1.8% YoY. Applies to Bordeaux Sud lease",source:"INSEE",relevance:"Modest uplift at next indexation review. Passes through fully under 100% ILAT clause.",flag:"info"},
+  ],
+  5: [ // Turin Ovest — Arvato SCM
+    {cat:"Tenant News",date:"Dec 2024",headline:"Bertelsmann Group posts €320m H1 net loss — Services division (Arvato) absorbs majority of provisions",source:"Bertelsmann IR",relevance:"Parent company under pressure. Parent guarantee enforceability review is now urgent.",flag:"danger"},
+    {cat:"Tenant News",date:"Nov 2024",headline:"Arvato SCM restructures Italian operations — Turin and Milan facilities placed under review",source:"Il Sole 24 Ore",relevance:"Direct asset risk. Turin Ovest facility explicitly mentioned. Tenant may seek to renegotiate or exit.",flag:"danger"},
+    {cat:"Tenant News",date:"Nov 2024",headline:"Arvato credit score downgraded to 58/100 (B+) — fourth consecutive quarterly decline",source:"D&B / Creditsafe",relevance:"Consistent with internal monitoring. Trajectory suggests sub-50 score within two quarters.",flag:"danger"},
+    {cat:"Country — IT",date:"Oct 2024",headline:"Turin industrial/logistics market — vacancy at 7.4%, above national average",source:"Colliers Italy",relevance:"Re-letting would be challenging. Target re-letting timeline 12–18 months with ERV discount likely.",flag:"warning"},
+    {cat:"Regulatory / Policy",date:"Oct 2024",headline:"Piedmont region announces €60m logistics infrastructure incentive — targeting green warehousing",source:"Regione Piemonte",relevance:"ESG upgrade at Turin Ovest could attract incentive funding and improve re-letting prospects.",flag:"info"},
+  ],
+};
+
+const CAT_COLORS = {
+  "Tenant News":       {bg:"#E8EDF3", text:"#0F2744"},
+  "Logistics RE Market":{bg:"#E8F5EE", text:"#1a6b3a"},
+  "Macro / Rates":     {bg:"#F2F0EC", text:"#555555"},
+  "Regulatory / Policy":{bg:C.terraLight, text:C.terraDark},
+  "Country — FR":      {bg:"#EEF2FF", text:"#3730a3"},
+  "Country — IT":      {bg:"#FFF0F0", text:"#7a1a1a"},
+  "Country — NL":      {bg:"#F0FFF4", text:"#1a6b3a"},
+};
+
+const FLAG_SCHEME = {danger:"danger", warning:"warning", success:"success", info:"info"};
+
+// ─── MARKET INTELLIGENCE TAB ──────────────────────────────────────────────────
+function MarketIntelligence({assets, selectedAsset}) {
+  const [scope, setScope] = useState("portfolio"); // "portfolio" | asset id
+  const [displayed, setDisplayed] = useState(null); // null = not yet generated
+  const [streaming, setStreaming] = useState(false);
+  const streamRef = useRef(null);
+
+  function getItems() {
+    if (scope === "portfolio") return NEWS_DATA.portfolio;
+    const id = parseInt(scope);
+    return NEWS_DATA[id] || [];
+  }
+
+  function streamIn() {
+    if (streamRef.current) clearInterval(streamRef.current);
+    setDisplayed([]); setStreaming(true);
+    const items = getItems();
+    let i = 0;
+    streamRef.current = setInterval(() => {
+      i++;
+      setDisplayed(items.slice(0, i));
+      if (i >= items.length) { clearInterval(streamRef.current); setStreaming(false); }
+    }, 220);
+  }
+
+  function reset() {
+    if (streamRef.current) clearInterval(streamRef.current);
+    setDisplayed(null); setStreaming(false);
+  }
+
+  const items = getItems();
+  const dangers = displayed ? displayed.filter(n => n.flag === "danger") : items.filter(n => n.flag === "danger");
+
+  return (
+    <div>
+      {/* Demo notice */}
+      <div style={{background:C.offWhite,border:`0.5px solid ${C.border}`,borderRadius:10,padding:"10px 18px",marginBottom:20,display:"flex",alignItems:"center",gap:12}}>
+        <span style={{fontSize:15}}>🔑</span>
+        <div style={{flex:1}}>
+          <span style={{fontSize:12,fontWeight:500,color:C.navy}}>Demo mode — pre-generated news. </span>
+          <span style={{fontSize:12,color:C.body}}>Connect a Claude API key with web search to enable live intelligence pulled from trusted sources.</span>
+        </div>
+        <Badge scheme="info">Claude API</Badge>
+      </div>
+
+      {/* Scope selector + refresh */}
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}>
+        <div style={{fontSize:10,fontWeight:600,color:C.muted,textTransform:"uppercase",letterSpacing:"0.07em"}}>Scope</div>
+        <select value={scope} onChange={e=>{setScope(e.target.value);reset();}}
+          style={{fontFamily:"inherit",fontSize:13,padding:"6px 12px",borderRadius:8,border:`0.5px solid ${C.border}`,background:C.white,color:C.navy,cursor:"pointer"}}>
+          <option value="portfolio">Full Portfolio</option>
+          {assets.map(a=><option key={a.id} value={a.id}>{a.flag} {a.name}</option>)}
+        </select>
+        <button onClick={streamIn} disabled={streaming}
+          style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"7px 18px",borderRadius:8,border:"none",background:streaming?C.muted:C.terra,color:"#fff",cursor:streaming?"default":"pointer",display:"flex",alignItems:"center",gap:7}}>
+          {streaming ? <><span>✦</span> Fetching…</> : <><span>✦</span> {displayed ? "Refresh" : "Generate Intelligence"}</>}
+        </button>
+        {displayed && !streaming && (
+          <div style={{fontSize:11,color:C.muted}}>
+            {displayed.length} items · {scope==="portfolio"?"Portfolio-wide":assets.find(a=>a.id===+scope)?.name}
+          </div>
+        )}
+        {displayed && dangers.length > 0 && !streaming && (
+          <Badge scheme="danger">{dangers.length} critical signal{dangers.length>1?"s":""}</Badge>
+        )}
+      </div>
+
+      {/* Empty / prompt state */}
+      {!displayed && !streaming && (
+        <div style={{textAlign:"center",padding:"60px 0",color:C.muted,fontSize:13}}>
+          <div style={{fontSize:28,marginBottom:14,opacity:0.3}}>📰</div>
+          Select a scope and click Generate Intelligence to pull the latest news.
+        </div>
+      )}
+
+      {/* Streaming placeholder rows */}
+      {streaming && displayed && displayed.length === 0 && (
+        <div style={{textAlign:"center",padding:"40px 0",color:C.terra,fontSize:13}}>
+          <div style={{fontSize:24,marginBottom:10}}>✦</div>Scanning sources…
+        </div>
+      )}
+
+      {/* News items */}
+      {displayed && displayed.length > 0 && (
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {displayed.map((n,i)=>{
+            const cs = CAT_COLORS[n.cat] || {bg:C.offWhite,text:C.body};
+            const fs = FLAG_SCHEME[n.flag] || "neutral";
+            return (
+              <div key={i} style={{background:C.white,border:`0.5px solid ${C.border}`,borderRadius:12,padding:"16px 20px",display:"flex",gap:16,alignItems:"flex-start"}}>
+                {/* Left: category + date */}
+                <div style={{flexShrink:0,width:140}}>
+                  <div style={{background:cs.bg,color:cs.text,fontSize:10,fontWeight:600,padding:"3px 9px",borderRadius:20,marginBottom:8,display:"inline-block",letterSpacing:"0.04em"}}>{n.cat}</div>
+                  <div style={{fontSize:11,color:C.muted}}>{n.date}</div>
+                </div>
+                {/* Centre: headline + source */}
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:500,color:C.navy,marginBottom:5,lineHeight:1.4}}>{n.headline}</div>
+                  <div style={{fontSize:11,color:C.muted}}>Source: {n.source}</div>
+                </div>
+                {/* Right: relevance + flag */}
+                <div style={{flexShrink:0,width:260}}>
+                  <div style={{fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.07em",color:C.muted,marginBottom:5}}>Portfolio Relevance</div>
+                  <div style={{fontSize:12,color:C.body,lineHeight:1.55,marginBottom:8}}>{n.relevance}</div>
+                  <Badge scheme={fs}>{n.flag==="danger"?"⚠ Critical":n.flag==="warning"?"Watch":n.flag==="success"?"Positive":"FYI"}</Badge>
+                </div>
+              </div>
+            );
+          })}
+          {streaming && (
+            <div style={{padding:"12px 20px",color:C.muted,fontSize:12,display:"flex",alignItems:"center",gap:8}}>
+              <span style={{color:C.terra}}>✦</span> Loading next item…
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── ASSET VIEW ───────────────────────────────────────────────────────────────
 function AssetView({assets,setAssets,initialAsset,openModal,onAddAsset}) {
   const [selId,setSelId]=useState(initialAsset?.id||assets[0].id);
+  const [innerTab,setInnerTab]=useState("overview"); // "overview" | "intelligence"
   const [csvState,setCsvState]=useState("idle");
   const [csvResult,setCsvResult]=useState(null);
   const fileRef=useRef();
@@ -1004,6 +1183,22 @@ Q2 2025,11500000,735000,120,5.25,3.9,2.0,33.7,1.74,3880000,81,A-,Renault Trucks 
         </div>
       </div>
 
+      {/* Inner tab strip */}
+      <div style={{display:"flex",gap:0,marginBottom:24,borderBottom:`0.5px solid ${C.border}`}}>
+        {[{id:"overview",label:"Overview"},{id:"intelligence",label:"✦ Market Intelligence"}].map(t=>(
+          <button key={t.id} onClick={()=>setInnerTab(t.id)}
+            style={{fontFamily:"inherit",fontSize:13,fontWeight:innerTab===t.id?500:400,padding:"8px 20px",border:"none",borderBottom:innerTab===t.id?`2px solid ${C.terra}`:"2px solid transparent",background:"none",color:innerTab===t.id?C.terra:C.muted,cursor:"pointer",marginBottom:"-0.5px",transition:"color 0.15s"}}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Market Intelligence tab */}
+      {innerTab==="intelligence"&&<MarketIntelligence assets={assets} selectedAsset={a}/>}
+
+      {/* Overview tab */}
+      {innerTab==="overview"&&<div>
+
       {/* AI parsing animation */}
       {csvState==="parsing"&&(
         <div style={{background:C.info.bg,border:`0.5px solid #b8cde0`,borderRadius:10,padding:"16px 20px",marginBottom:18}}>
@@ -1166,6 +1361,7 @@ Q2 2025,11500000,735000,120,5.25,3.9,2.0,33.7,1.74,3880000,81,A-,Renault Trucks 
           </table>
         </div>
       </div>
+      </div>{/* end overview tab */}
     </div>
   );
 }
