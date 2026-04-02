@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 
 // ─── BRAND ────────────────────────────────────────────────────────────────────
 const C = {
@@ -1194,10 +1194,10 @@ Q2 2025,11500000,735000,120,5.25,3.9,2.0,33.7,1.74,3880000,81,A-,Renault Trucks 
       </div>
 
       {/* Market Intelligence tab */}
-      {innerTab==="intelligence"&&<MarketIntelligence assets={assets} selectedAsset={a}/>}
+      {innerTab==="intelligence" && <MarketIntelligence assets={assets} selectedAsset={a}/>}
 
       {/* Overview tab */}
-      {innerTab==="overview"&&<div>
+      {innerTab==="overview" && <React.Fragment>
 
       {/* AI parsing animation */}
       {csvState==="parsing"&&(
@@ -1361,7 +1361,7 @@ Q2 2025,11500000,735000,120,5.25,3.9,2.0,33.7,1.74,3880000,81,A-,Renault Trucks 
           </table>
         </div>
       </div>
-      </div>
+      </React.Fragment>}
     </div>
   );
 }
