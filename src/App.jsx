@@ -2059,7 +2059,7 @@ const LOGO="https://res.cloudinary.com/dsgfts9gp/image/upload/Gemini_Generated_I
 
 const STEPS=[
   {num:"01",label:"Command Centre",desc:"Portfolio-level KPIs, aggregated trend charts and expandable asset rows — the daily check-in view.",ai:false},
-  {num:"02",label:"Asset View",desc:"Per-asset drill-down with 7 quarterly history charts, tenancy and financing detail, and AI-powered data import.",ai:true},
+  {num:"02",label:"Asset View",desc:"Per-asset drill-down with quarterly history charts, tenancy and financing detail, AI-powered data import, and lease clause Q&A.",ai:true},
   {num:"03",label:"AI Briefing",desc:"Claude generates a structured analyst note per asset or full portfolio — situation, risks, positives and recommended actions.",ai:true},
   {num:"04",label:"Alerts",desc:"Automatic flags for loan maturity, credit deterioration, WALT thresholds and ICR covenant proximity — sorted by urgency.",ai:false},
 ];
@@ -2068,7 +2068,7 @@ const FEATURES=[
   {label:"Quarterly data history",desc:"Track valuation, rent, cap rate, ERV, credit score, LTV and ICR across every period — with line charts and a period-by-period table."},
   {label:"Smart alert engine",desc:"Seven alert types fire automatically — refinancing timelines, credit score drops, WALT shortening, ICR covenant proximity and more."},
   {label:"AI Import — CSV & PDF",desc:"Upload a data export or valuation report in any format or language. Claude reads the headers, maps the fields and flags what's missing."},
-  {label:"Portfolio-level aggregation",desc:"GAV, gross rent, WALT and average credit score trended across all assets — valuation-weighted, updated with every quarterly input."},
+  {label:"Lease clause Q&A",desc:"Upload each asset's lease and ask plain-English questions — who repairs the roof, what are the break mechanics, what notice is required. Clause and page references included."},
 ];
 
 function Landing({onStart}) {
@@ -2147,7 +2147,7 @@ function Landing({onStart}) {
             <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",lineHeight:1.7}}>Briefings, data import mapping and Q&A are pre-computed in demo mode. Connect a Claude API key to enable live generation from your own portfolio data — no data is transmitted externally in demo mode.</div>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:38,flexShrink:0}}>
-            {["AI Briefing — per asset and full portfolio","Ask the Portfolio — free-text Q&A","AI Upload — CSV and PDF interpretation","Add Asset — AI-assisted onboarding"].map(f=>(
+            {["AI Briefing — per asset and full portfolio","Ask the Portfolio — free-text Q&A","AI Upload — CSV and PDF interpretation","Lease Q&A — clause review with page references","Add Asset — AI-assisted onboarding"].map(f=>(
               <div key={f} style={{display:"flex",alignItems:"center",gap:10}}>
                 <div style={{width:3,height:3,borderRadius:"50%",background:C.terra}}/>
                 <span style={{fontSize:12,color:"rgba(255,255,255,0.5)"}}>{f}</span>
