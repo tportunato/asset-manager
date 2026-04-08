@@ -1152,6 +1152,21 @@ function LeaseQA({asset}) {
         <div style={{background:C.offWhite,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"5px 12px",fontSize:11,color:C.muted,cursor:"default"}}>Demo mode</div>
       </div>
 
+      {/* Free-text input — disabled in demo */}
+      <div style={{marginBottom:20}}>
+        <div style={{display:"flex",gap:8}}>
+          <input
+            disabled
+            placeholder="Ask anything about this lease — not available in demo mode"
+            style={{flex:1,fontFamily:"inherit",fontSize:13,padding:"9px 14px",borderRadius:8,border:`0.5px solid ${C.border}`,background:C.offWhite,color:C.muted,cursor:"not-allowed",outline:"none"}}
+          />
+          <button disabled style={{fontFamily:"inherit",fontSize:12,fontWeight:500,padding:"9px 18px",borderRadius:8,border:"none",background:C.border,color:C.muted,cursor:"not-allowed",display:"flex",alignItems:"center",gap:6}}>
+            <span>✦</span> Ask
+          </button>
+        </div>
+        <div style={{fontSize:11,color:C.muted,marginTop:6,paddingLeft:2}}>Connect a Claude API key to enable free-text lease queries with clause and page references.</div>
+      </div>
+
       <div style={{display:"grid",gridTemplateColumns:"300px 1fr",gap:20,alignItems:"start"}}>
         {/* Question list */}
         <div>
@@ -1569,10 +1584,10 @@ Q2 2025,11500000,735000,120,5.25,3.9,2.0,33.7,1.74,3880000,81,A-,Renault Trucks 
 
       {/* Inner tab strip */}
       <div style={{display:"flex",gap:0,marginBottom:24,borderBottom:`0.5px solid ${C.border}`}}>
-        {[{id:"overview",label:"Overview"},{id:"intelligence",label:"✦ Market Intelligence"},{id:"lease",label:"📄 Lease Q&A"}].map(t=>(
+        {[{id:"overview",label:"Overview"},{id:"lease",label:"Lease Q&A",ai:true},{id:"intelligence",label:"Market Intelligence",ai:true}].map(t=>(
           <button key={t.id} onClick={()=>setInnerTab(t.id)}
             style={{fontFamily:"inherit",fontSize:13,fontWeight:innerTab===t.id?500:400,padding:"8px 20px",border:"none",borderBottom:innerTab===t.id?`2px solid ${C.terra}`:"2px solid transparent",background:"none",color:innerTab===t.id?C.terra:C.muted,cursor:"pointer",marginBottom:"-0.5px",transition:"color 0.15s"}}>
-            {t.label}
+            {t.ai&&<span style={{marginRight:5}}>✦</span>}{t.label}
           </button>
         ))}
       </div>
