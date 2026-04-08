@@ -2067,8 +2067,8 @@ const STEPS=[
 const FEATURES=[
   {label:"Quarterly data history",desc:"Track valuation, rent, cap rate, ERV, credit score, LTV and ICR across every period — with line charts and a period-by-period table."},
   {label:"Smart alert engine",desc:"Seven alert types fire automatically — refinancing timelines, credit score drops, WALT shortening, ICR covenant proximity and more."},
+  {label:"Lease clause Q&A",desc:"Upload each asset's lease and ask plain-English questions. Claude returns the relevant clause and page number — in French, Italian, and Dutch."},
   {label:"AI Import — CSV & PDF",desc:"Upload a data export or valuation report in any format or language. Claude reads the headers, maps the fields and flags what's missing."},
-  {label:"Lease clause Q&A",desc:"Upload each asset's lease and ask plain-English questions — who repairs the roof, what are the break mechanics, what notice is required. Clause and page references included."},
 ];
 
 function Landing({onStart}) {
@@ -2087,22 +2087,98 @@ function Landing({onStart}) {
         </div>
       </header>
       {/* Hero */}
-      <div style={{background:C.navy,padding:"100px 48px 110px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center"}}>
-        <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.1em",color:"rgba(255,255,255,0.35)",textTransform:"uppercase",marginBottom:28}}>Asset Management Tool</div>
-        <h1 style={{fontSize:40,fontWeight:600,color:"#fff",margin:"0 0 20px",letterSpacing:"-0.025em",lineHeight:1.15,maxWidth:580}}>
+      <div style={{background:C.navy,padding:"72px 48px 0",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center"}}>
+        <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.1em",color:"rgba(255,255,255,0.35)",textTransform:"uppercase",marginBottom:24}}>Asset Management Tool</div>
+        <h1 style={{fontSize:40,fontWeight:600,color:"#fff",margin:"0 0 18px",letterSpacing:"-0.025em",lineHeight:1.15,maxWidth:580}}>
           Portfolio oversight,<br/>built for the asset manager.
         </h1>
-        <p style={{fontSize:15,color:"rgba(255,255,255,0.5)",margin:"0 0 48px",maxWidth:460,lineHeight:1.7,fontWeight:400}}>
-          Track valuation, rent, credit and financing across every asset in your fund — with quarterly history, smart alerts, and AI-generated briefings on demand.
+        <p style={{fontSize:15,color:"rgba(255,255,255,0.5)",margin:"0 0 28px",maxWidth:500,lineHeight:1.7,fontWeight:400}}>
+          Track valuation, rent, credit and financing across every asset — with quarterly history, smart alerts, AI briefings, lease Q&A, and market intelligence on demand.
         </p>
+        {/* AI feature pills */}
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"center",marginBottom:32}}>
+          {["✦ AI Briefing","✦ Lease Q&A","✦ AI Upload — CSV & PDF","✦ Market Intelligence"].map(f=>(
+            <span key={f} style={{fontSize:11,fontWeight:500,color:"rgba(255,255,255,0.6)",background:"rgba(255,255,255,0.08)",border:"0.5px solid rgba(255,255,255,0.15)",padding:"5px 12px",borderRadius:20}}>{f}</span>
+          ))}
+        </div>
         <button
           onClick={onStart}
           onMouseEnter={()=>setHov(true)}
           onMouseLeave={()=>setHov(false)}
-          style={{padding:"12px 28px",background:hov?"#A85520":C.terra,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",letterSpacing:"0.01em",transition:"background 0.15s",fontFamily:"inherit"}}>
+          style={{padding:"12px 28px",background:hov?"#A85520":C.terra,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",letterSpacing:"0.01em",transition:"background 0.15s",fontFamily:"inherit",marginBottom:14}}>
           Get Started →
         </button>
-        <div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:14}}>Pre-loaded with 5 fictionalised logistics assets</div>
+        <div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginBottom:48}}>Pre-loaded with 5 fictionalised logistics assets</div>
+        {/* App mock frame */}
+        <div style={{width:"100%",maxWidth:960,borderRadius:"12px 12px 0 0",border:"0.5px solid rgba(255,255,255,0.12)",background:"#1a3150",overflow:"hidden"}}>
+          <div style={{background:"#0c1e35",padding:"10px 16px",display:"flex",alignItems:"center",gap:6,borderBottom:"0.5px solid rgba(255,255,255,0.08)"}}>
+            <div style={{width:10,height:10,borderRadius:"50%",background:"#e74c3c",opacity:0.8}}/>
+            <div style={{width:10,height:10,borderRadius:"50%",background:"#f39c12",opacity:0.8}}/>
+            <div style={{width:10,height:10,borderRadius:"50%",background:"#2ecc71",opacity:0.8}}/>
+            <div style={{flex:1,margin:"0 12px",background:"rgba(255,255,255,0.06)",borderRadius:4,height:22,display:"flex",alignItems:"center",padding:"0 10px"}}>
+              <span style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>asset-manager-azure-one.vercel.app</span>
+            </div>
+          </div>
+          <div style={{background:C.navy,padding:"0 20px",height:44,display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"0.5px solid rgba(255,255,255,0.08)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:24,height:24,background:"rgba(255,255,255,0.1)",borderRadius:4}}/>
+              <div style={{width:"0.5px",height:12,background:"rgba(255,255,255,0.15)",margin:"0 4px"}}/>
+              <span style={{fontSize:11,fontWeight:500,color:"#fff"}}>Asset Manager</span>
+              <div style={{width:3,height:3,borderRadius:"50%",background:C.terra}}/>
+              <span style={{fontSize:8,color:"rgba(255,255,255,0.35)",textTransform:"uppercase",letterSpacing:"0.07em"}}>RE Portfolio Intelligence</span>
+            </div>
+            <div style={{display:"flex",gap:2}}>
+              {["Command Centre","Asset View","AI Briefing","Alerts (8)"].map((t,i)=>(
+                <span key={t} style={{fontSize:10,color:i===0?"#fff":"rgba(255,255,255,0.5)",background:i===0?"rgba(255,255,255,0.12)":"transparent",padding:"3px 10px",borderRadius:4}}>{t}</span>
+              ))}
+            </div>
+          </div>
+          <div style={{background:C.offWhite,padding:20}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>
+              {[["Portfolio GAV","€46.8m","5 assets · 3 countries"],["Total Gross Rent","€2.7m","per annum"],["Total Debt","€25.8m","Portfolio LTV: 55.1%"],["Portfolio WALT","4.1y","valuation-weighted"]].map(([l,v,s])=>(
+                <div key={l} style={{background:C.white,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>
+                  <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:4}}>{l}</div>
+                  <div style={{fontSize:18,fontWeight:600,color:C.terra}}>{v}</div>
+                  <div style={{fontSize:9,color:"#aaa",marginTop:2}}>{s}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{background:C.warning.bg,border:"0.5px solid #f0d4a0",borderRadius:8,padding:"7px 14px",marginBottom:14,display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontSize:11,fontWeight:600,color:C.navy}}>🔔 Alerts</span>
+              <span style={{fontSize:10,fontWeight:500,background:C.danger.bg,color:C.danger.text,padding:"2px 8px",borderRadius:20}}>3 critical</span>
+              <span style={{fontSize:10,fontWeight:500,background:C.warning.bg,color:C.warning.text,padding:"2px 8px",borderRadius:20}}>5 watch</span>
+              <span style={{fontSize:10,color:C.muted,marginLeft:4}}>Rotterdam Gate: Loan matured Dec 2025 — begin refinancing now.</span>
+            </div>
+            <div style={{background:C.white,border:`0.5px solid ${C.border}`,borderRadius:10,overflow:"hidden"}}>
+              <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr 20px",padding:"6px 14px",background:C.offWhite,borderBottom:`0.5px solid ${C.border}`}}>
+                {["Asset / Tenant","Valuation","Annual Rent","Cap Rate","WALT / WALB",""].map(h=>(
+                  <span key={h} style={{fontSize:8,fontWeight:600,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em"}}>{h}</span>
+                ))}
+              </div>
+              {[
+                {flag:"🇫🇷",name:"Lyon Nord",tenant:"Renault Trucks SAS",rating:"A-",val:"€11.2m",valD:"+33.3%",rent:"€721k",rentD:"+7.3%",cap:"5.20%",capD:"+40bps",walt:"4.2y / 2.1y",health:"ok"},
+                {flag:"🇮🇹",name:"Milan Est",tenant:"DHL Supply Chain S.r.l.",rating:"AA-",val:"€8.95m",valD:"+24.3%",rent:"€538k",rentD:"+9.8%",cap:"5.40%",capD:"+30bps",walt:"5.8y / 3.7y",health:"ok"},
+                {flag:"🇳🇱",name:"Rotterdam Gate",tenant:"Geodis BV",rating:"BBB+",val:"€16.8m",valD:"+19.1%",rent:"€865k",rentD:"+6.3%",cap:"5.00%",capD:"+60bps",walt:"1.9y / 0.9y",health:"danger"},
+              ].map((a,i)=>(
+                <div key={a.name} style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr 20px",padding:"9px 14px",borderBottom:i<2?`0.5px solid ${C.border}`:"none",alignItems:"center",background:a.health==="danger"?"#FFFAF8":C.white}}>
+                  <div>
+                    <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:2}}>
+                      <div style={{width:7,height:7,borderRadius:"50%",background:a.health==="danger"?C.danger.text:C.success.text,flexShrink:0}}/>
+                      <span style={{fontSize:11,fontWeight:500,color:C.navy}}>{a.flag} {a.name}</span>
+                      <span style={{fontSize:9,fontWeight:500,background:a.health==="danger"?C.danger.bg:C.success.bg,color:a.health==="danger"?C.danger.text:C.success.text,padding:"1px 6px",borderRadius:20}}>{a.health==="danger"?"Flag":"Clean"}</span>
+                    </div>
+                    <span style={{fontSize:9,color:C.muted,paddingLeft:12}}>{a.tenant} · {a.rating}</span>
+                  </div>
+                  <div><div style={{fontSize:11,fontWeight:600,color:C.navy}}>{a.val}</div><div style={{fontSize:9,color:C.success.text}}>{a.valD} vs acq.</div></div>
+                  <div><div style={{fontSize:11,fontWeight:600,color:C.navy}}>{a.rent}</div><div style={{fontSize:9,color:C.success.text}}>{a.rentD} vs acq.</div></div>
+                  <div><div style={{fontSize:11,fontWeight:600,color:C.navy}}>{a.cap}</div><div style={{fontSize:9,color:C.warning.text}}>{a.capD} vs entry</div></div>
+                  <div><div style={{fontSize:11,fontWeight:600,color:a.health==="danger"?C.danger.text:C.navy}}>{a.walt}</div><div style={{fontSize:9,color:C.muted}}>WALT / WALB</div></div>
+                  <div style={{fontSize:11,color:C.muted,textAlign:"center"}}>▾</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
       {/* Steps */}
       <div style={{background:C.white,padding:"80px 48px"}}>
@@ -2133,24 +2209,6 @@ function Landing({onStart}) {
               <div key={f.label} style={{borderTop:`0.5px solid ${C.border}`,paddingTop:20}}>
                 <div style={{fontSize:13,fontWeight:500,color:C.navy,marginBottom:6}}>{f.label}</div>
                 <div style={{fontSize:13,color:C.muted,lineHeight:1.6}}>{f.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      {/* AI strip */}
-      <div style={{background:C.navy,padding:"48px"}}>
-        <div style={{maxWidth:900,margin:"0 auto",display:"flex",alignItems:"flex-start",gap:80}}>
-          <div style={{flex:1}}>
-            <div style={{fontSize:10,fontWeight:600,letterSpacing:"0.1em",color:C.terra,textTransform:"uppercase",marginBottom:16}}>AI features</div>
-            <div style={{fontSize:15,fontWeight:500,color:"#fff",marginBottom:12,lineHeight:1.4}}>Claude acts as a second analyst on every asset in your portfolio</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,0.45)",lineHeight:1.7}}>Briefings, data import mapping and Q&A are pre-computed in demo mode. Connect a Claude API key to enable live generation from your own portfolio data — no data is transmitted externally in demo mode.</div>
-          </div>
-          <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:38,flexShrink:0}}>
-            {["AI Briefing — per asset and full portfolio","Ask the Portfolio — free-text Q&A","AI Upload — CSV and PDF interpretation","Lease Q&A — clause review with page references","Add Asset — AI-assisted onboarding"].map(f=>(
-              <div key={f} style={{display:"flex",alignItems:"center",gap:10}}>
-                <div style={{width:3,height:3,borderRadius:"50%",background:C.terra}}/>
-                <span style={{fontSize:12,color:"rgba(255,255,255,0.5)"}}>{f}</span>
               </div>
             ))}
           </div>
